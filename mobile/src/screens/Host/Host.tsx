@@ -10,6 +10,7 @@ import {
 } from "react-native-webrtc";
 
 const clientId = "mobile-user-1";
+const remoteClientId = "web-client-1";
 
 export const HostScreen = () => {
   const webSocketRef = useRef<WebSocket | null>(null);
@@ -25,13 +26,7 @@ export const HostScreen = () => {
 
     const constraints = {
       audio: true,
-      video: {
-        mandatory: {
-          minWidth: 500, // Provide your own width, height and frame rate here
-          minHeight: 300,
-          minFrameRate: 30,
-        },
-      },
+      video: true,
     };
 
     const stream = await mediaDevices.getUserMedia(constraints);
@@ -46,8 +41,16 @@ export const HostScreen = () => {
 
     const socket = new WebSocket(`ws://localhost:5000/ws?clientId=${clientId}`);
 
-    socket.addEventListener("message", (ev) => {
-      console.log("ev", ev.data);
+    socket.addEventListener("message", async (ev) => {
+      const data = JSON.parse(ev.data);
+
+      if (data.messageType === "answer") {
+        peerConnection.setRemoteDescription(data.payload);
+      }
+
+      if (data.messageType === "ice-candidate") {
+        peerConnection.addIceCandidate(data.payload);
+      }
     });
 
     await new Promise((resolve) => {
@@ -58,27 +61,31 @@ export const HostScreen = () => {
       if (event.candidate) {
         socket.send(
           JSON.stringify({
-            ...event.candidate,
-            clientId,
+            messageType: "ice-candidate",
+            recipientClientId: remoteClientId,
+            payload: event.candidate,
           })
         );
       }
     });
 
-    if (stream.getVideoTracks()[0]) {
-      peerConnection.addTrack(stream.getVideoTracks()[0]);
+    for (const track of stream.getTracks()) {
+      peerConnection.addTrack(track, stream);
     }
 
-    const offer: RTCSessionDescription = await peerConnection.createOffer({});
+    const offer: RTCSessionDescription = await peerConnection.createOffer({
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: true,
+    });
+    await peerConnection.setLocalDescription(offer);
 
     socket.send(
       JSON.stringify({
-        ...offer,
-        clientId,
+        messageType: "offer",
+        recipientClientId: remoteClientId,
+        payload: offer,
       })
     );
-
-    peerConnection.setLocalDescription(offer);
 
     webSocketRef.current = socket;
     peerRef.current = peerConnection;

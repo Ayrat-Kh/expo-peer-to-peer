@@ -1,16 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+
+const clientId = "web-client-1";
+const remoteClientId = "mobile-user-1";
 
 export default function Home() {
-  const [configJson, setConfigJson] = useState<string>("");
   const videoRef = useRef<HTMLVideoElement>(null);
-  const peerRef = useRef<RTCPeerConnection>();
+  const peerRef = useRef<RTCPeerConnection | null>();
+  const webSocketRef = useRef<WebSocket | null>();
 
-  const handleConnect = async () => {
-    setConfigJson(configJson);
+  const connectToCall = async () => {
+    webSocketRef.current?.close();
+    webSocketRef.current = null;
 
-    peerRef.current = new RTCPeerConnection({
+    peerRef.current?.close();
+    peerRef.current = null;
+
+    const socket = new WebSocket(`ws://localhost:5000/ws?clientId=${clientId}`);
+    await new Promise((resolve) => socket.addEventListener("open", resolve));
+
+    socket.addEventListener("close", () => {
+      console.error("Please try again later.");
+    });
+
+    const peerConnection = new RTCPeerConnection({
       iceServers: [
         {
           urls: "stun:stun.l.google.com:19302",
@@ -18,60 +32,59 @@ export default function Home() {
       ],
     });
 
-    peerRef.current.addEventListener("icecandidate", (event) => {
-      console.log("event", event);
-      if (!event.candidate) {
-      }
-    });
+    peerConnection.onicecandidate = (event) => {
+      socket.send(
+        JSON.stringify({
+          messageType: "ice-candidate",
+          recipientClientId: remoteClientId,
+          payload: event.candidate,
+        })
+      );
+    };
 
-    peerRef.current.addEventListener("track", (event) => {
-      if (videoRef.current?.srcObject && event.streams[0]) {
+    peerConnection.ontrack = (event) => {
+      console.log("track", event.streams[0]);
+
+      if (videoRef.current && event.streams[0]) {
         videoRef.current.srcObject = event.streams[0];
       }
+    };
+
+    socket.addEventListener("message", async (ev) => {
+      const data = JSON.parse(ev.data);
+
+      if (data.messageType === "offer") {
+        await peerConnection.setRemoteDescription(data.payload);
+
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        socket.send(
+          JSON.stringify({
+            recipientClientId: remoteClientId,
+            messageType: "answer",
+            payload: answer,
+          })
+        );
+        return;
+      }
+
+      if (data.messageType === "ice-candidate") {
+        peerConnection.addIceCandidate(data.payload);
+
+        return;
+      }
     });
 
-    const obj = JSON.parse(configJson);
-    peerRef.current.setRemoteDescription(obj);
-    const answer = await peerRef.current.createAnswer(obj);
-
-    peerRef.current.setLocalDescription(answer);
-
-    const serializedAnswer = JSON.stringify(answer);
-
-    console.log("answer", serializedAnswer);
-
-    navigator.clipboard.writeText(serializedAnswer);
-
-    localStorage.setItem("connection", configJson);
+    peerRef.current = peerConnection;
+    webSocketRef.current = socket;
   };
-
-  useEffect(() => {
-    setConfigJson(localStorage.getItem("connection") ?? "");
-  }, []);
 
   return (
     <main className="flex flex-col p-10">
-      <label className="flex flex-col w-96">
-        Config
-        <textarea
-          className="mt-2 text-black"
-          cols={40}
-          rows={5}
-          value={configJson}
-          onChange={(e) => {
-            setConfigJson(e.target.value);
-          }}
-        />
-      </label>
+      <button onClick={connectToCall}>Connect to call</button>
 
-      <button
-        className="w-96 bg-slate-300 mt-2  text-blue-700"
-        onClick={handleConnect}
-      >
-        Connect
-      </button>
-
-      <video ref={videoRef} className="bg-blue-100 mt-6" />
+      <video ref={videoRef} className="bg-blue-100 mt-6 w-2/5" autoPlay muted />
     </main>
   );
 }

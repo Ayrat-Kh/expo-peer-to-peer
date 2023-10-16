@@ -11,19 +11,18 @@ const (
 )
 
 type Request struct {
-	MessageType RequestType     `json:"messageType"`
-	Payload     json.RawMessage `json:"payload"`
+	MessageType       RequestType     `json:"messageType"`
+	RecipientClientId string          `json:"recipientClientId"`
+	Payload           json.RawMessage `json:"payload"`
 }
 
 type Description struct {
-	Sdp      string `json:"sdp"`
-	Type     string `json:"type"`
-	ClientId string `json:"clientId"`
+	Sdp  string `json:"sdp"`
+	Type string `json:"type"`
 }
 
 type IceCandidate struct {
 	Candidate     string `json:"candidate"`
 	SdpMLineIndex int32  `json:"sdpMLineIndex"`
 	SdpMid        string `json:"sdpMid"`
-	ClientId      string `json:"clientId"`
 }

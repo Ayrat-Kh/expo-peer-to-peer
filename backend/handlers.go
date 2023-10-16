@@ -5,32 +5,16 @@ import (
 	"log"
 )
 
-func (hub *Hub) HandleAnswerOrOffer(description Description) {
-	client, ok := hub.clients[description.ClientId]
+func (hub *Hub) HandleResend(clientId string, request Request) {
+	client, ok := hub.clients[clientId]
 
 	if !ok {
-		log.Printf("[HandleAnswerOrOffer] No client found with id %s", description.ClientId)
+		log.Printf("[HandleAnswerOrOffer] No client found with id %s", clientId)
 		return
 	}
 
-	res, _ := json.Marshal(&description)
-
-	if res == nil {
-		return
-	}
-
-	client.send <- res
-}
-
-func (hub *Hub) HandleIceCandidate(iceCandidate IceCandidate) {
-	client, ok := hub.clients[iceCandidate.ClientId]
-
-	if !ok {
-		log.Printf("[HandleIceCandidate] No client found with id %s", iceCandidate.ClientId)
-		return
-	}
-
-	res, _ := json.Marshal(&iceCandidate)
+	// resend request
+	res, _ := json.Marshal(&request)
 
 	if res == nil {
 		return
