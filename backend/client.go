@@ -119,7 +119,11 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 
 	query := r.URL.Query()
 
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), clientId: query.Get("clientId")}
+	clientId := query.Get("clientId")
+
+	log.Printf("Connected client %s", clientId)
+
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), clientId: clientId}
 	client.hub.register <- client
 
 	// Allow collection of memory referenced by the caller by doing all work in

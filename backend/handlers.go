@@ -21,3 +21,20 @@ func (hub *Hub) HandleAnswerOrOffer(description Description) {
 
 	client.send <- res
 }
+
+func (hub *Hub) HandleIceCandidate(iceCandidate IceCandidate) {
+	client, ok := hub.clients[iceCandidate.ClientId]
+
+	if !ok {
+		log.Printf("[HandleIceCandidate] No client found with id %s", iceCandidate.ClientId)
+		return
+	}
+
+	res, _ := json.Marshal(&iceCandidate)
+
+	if res == nil {
+		return
+	}
+
+	client.send <- res
+}

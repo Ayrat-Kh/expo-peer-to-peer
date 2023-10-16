@@ -1,20 +1,28 @@
 import { useRef, useState } from "react";
-import { Text, Pressable, TextInput } from "react-native";
+import { Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   RTCPeerConnection,
-  RTCSessionDescription,
   RTCView,
   mediaDevices,
+  type RTCSessionDescription,
   type MediaStream,
 } from "react-native-webrtc";
 
+const clientId = "mobile-user-1";
+
 export const HostScreen = () => {
+  const webSocketRef = useRef<WebSocket | null>(null);
   const peerRef = useRef<RTCPeerConnection | null>(null);
-  const [answer, setAnswer] = useState<string>("");
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 
   const handleCreateSession = async () => {
+    peerRef.current?.close();
+    peerRef.current = null;
+
+    webSocketRef.current?.close();
+    webSocketRef.current = null;
+
     const constraints = {
       audio: true,
       video: {
@@ -26,9 +34,9 @@ export const HostScreen = () => {
       },
     };
 
-    setLocalStream(await mediaDevices.getUserMedia(constraints));
+    const stream = await mediaDevices.getUserMedia(constraints);
 
-    peerRef.current = new RTCPeerConnection({
+    const peerConnection = new RTCPeerConnection({
       iceServers: [
         {
           urls: "stun:stun.l.google.com:19302",
@@ -36,27 +44,45 @@ export const HostScreen = () => {
       ],
     });
 
-    peerRef.current.addEventListener("icecandidate", (event) => {
-      console.log("event.candidate");
-      if (!event.candidate) {
+    const socket = new WebSocket(`ws://localhost:5000/ws?clientId=${clientId}`);
+
+    socket.addEventListener("message", (ev) => {
+      console.log("ev", ev.data);
+    });
+
+    await new Promise((resolve) => {
+      socket.addEventListener("open", resolve);
+    });
+
+    peerConnection.addEventListener("icecandidate", (event) => {
+      if (event.candidate) {
+        socket.send(
+          JSON.stringify({
+            ...event.candidate,
+            clientId,
+          })
+        );
       }
     });
 
-    if (localStream?.getVideoTracks()[0]) {
-      peerRef.current?.addTrack(localStream.getVideoTracks()[0]);
+    if (stream.getVideoTracks()[0]) {
+      peerConnection.addTrack(stream.getVideoTracks()[0]);
     }
 
-    const offer = (await peerRef.current.createOffer(
-      {}
-    )) as RTCSessionDescription;
+    const offer: RTCSessionDescription = await peerConnection.createOffer({});
 
-    peerRef.current.setLocalDescription(offer);
+    socket.send(
+      JSON.stringify({
+        ...offer,
+        clientId,
+      })
+    );
 
-    console.log("offer", JSON.stringify(offer));
-  };
+    peerConnection.setLocalDescription(offer);
 
-  const handleAnswer = () => {
-    peerRef.current?.setRemoteDescription(JSON.parse(answer));
+    webSocketRef.current = socket;
+    peerRef.current = peerConnection;
+    setLocalStream(stream);
   };
 
   return (
@@ -72,26 +98,6 @@ export const HostScreen = () => {
         onPress={handleCreateSession}
       >
         <Text>Create session</Text>
-      </Pressable>
-
-      <Text style={{ marginTop: 12 }}>Answer</Text>
-      <TextInput
-        multiline
-        style={{ backgroundColor: "grey", height: 100 }}
-        onChangeText={setAnswer}
-      />
-
-      <Pressable
-        style={{
-          marginTop: 12,
-          paddingVertical: 4,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "grey",
-        }}
-        onPress={handleAnswer}
-      >
-        <Text>Handle answer</Text>
       </Pressable>
 
       <RTCView
