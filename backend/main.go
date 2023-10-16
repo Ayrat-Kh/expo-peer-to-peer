@@ -16,11 +16,8 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("ws")
 		ServeWs(hub, w, r)
 	})
-
-	log.Println("Start app", *addr)
 
 	err := http.ListenAndServe(*addr, mux)
 
