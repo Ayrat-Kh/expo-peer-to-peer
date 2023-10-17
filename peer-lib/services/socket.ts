@@ -19,7 +19,7 @@ export class Socket {
 
     const socket = new WebSocket(`${this.socketUrl}?clientId=${this.clientId}`);
 
-    socket.addEventListener("message", this.#messageListener.bind(this));
+    socket.addEventListener("message", this.messageListener.bind(this));
 
     await new Promise<void>((resolve) => {
       if (socket.readyState === WebSocket.OPEN) {
@@ -59,7 +59,7 @@ export class Socket {
     this.socket = undefined;
   }
 
-  #messageListener(ev: MessageEvent<any>) {
+  private messageListener(ev: MessageEvent<any>) {
     try {
       const data = JSON.parse(ev.data) as SocketMessage;
       const { messageType, payload } = data;

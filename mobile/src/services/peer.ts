@@ -1,3 +1,10 @@
+import {
+  RTCPeerConnection,
+  type RTCIceCandidate,
+  type MediaStream,
+  type RTCSessionDescription,
+} from "react-native-webrtc";
+
 type PeerConnection = Pick<
   RTCPeerConnection,
   | "addEventListener"
@@ -12,6 +19,8 @@ type PeerConnection = Pick<
 >;
 
 export class Peer {
+  private readonly peerConnection: PeerConnection;
+
   public onIceCandidate:
     | ((candidate: RTCIceCandidate) => void | Promise<void>)
     | undefined = undefined;
@@ -20,17 +29,17 @@ export class Peer {
     | ((streams: ReadonlyArray<MediaStream>) => void | Promise<void>)
     | undefined = undefined;
 
-  constructor(private readonly peerConnection: PeerConnection) {}
-
-  async connect() {
-    this.peerConnection.setConfiguration({
+  constructor() {
+    this.peerConnection = new RTCPeerConnection({
       iceServers: [
         {
           urls: "stun:stun.l.google.com:19302",
         },
       ],
     });
+  }
 
+  async connect() {
     this.peerConnection.addEventListener("icecandidate", (event) => {
       if (event.candidate) {
         this.onIceCandidate?.(event.candidate);
@@ -50,30 +59,26 @@ export class Peer {
     }
   }
 
-  async createOffer(): Promise<RTCSessionDescriptionInit> {
-    const offer: RTCSessionDescriptionInit =
-      await this.peerConnection.createOffer({
-        offerToReceiveAudio: true,
-        offerToReceiveVideo: true,
-      });
+  async createOffer(): Promise<RTCSessionDescription> {
+    const offer: RTCSessionDescription = await this.peerConnection.createOffer({
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: true,
+    });
 
     await this.peerConnection.setLocalDescription(offer);
 
     return offer;
   }
 
-  async createAnswer(offer: RTCSessionDescriptionInit): Promise<void> {
+  async createAnswer(offer: RTCSessionDescription): Promise<void> {
     if (!this.peerConnection) {
       return;
     }
 
     await this.setRemoteDescription(offer);
 
-    const answer: RTCSessionDescriptionInit =
-      await this.peerConnection.createAnswer({
-        // offerToReceiveAudio: true,
-        // offerToReceiveVideo: true,
-      });
+    const answer: RTCSessionDescription =
+      await this.peerConnection.createAnswer();
 
     await this.peerConnection.setLocalDescription(answer);
   }
@@ -83,7 +88,7 @@ export class Peer {
   }
 
   async setRemoteDescription(
-    description: RTCSessionDescriptionInit
+    description: RTCSessionDescription
   ): Promise<void> {
     await this.peerConnection?.setRemoteDescription(description);
   }
