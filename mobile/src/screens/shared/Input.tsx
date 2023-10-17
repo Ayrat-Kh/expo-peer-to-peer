@@ -1,17 +1,23 @@
 import React from "react";
-import { View, StyleSheet, TextInput } from "react-native";
+import { View, type ViewProps, StyleSheet, TextInput } from "react-native";
 
 import { Label } from "./Label";
 
 export interface InputProps {
   label?: React.ReactNode;
   value: string;
+  style?: ViewProps["style"];
   onChange: (v: string) => void;
 }
 
-export const Input: React.FC<InputProps> = ({ label, value, onChange }) => {
+export const Input: React.FC<InputProps> = ({
+  label,
+  style,
+  value,
+  onChange,
+}) => {
   return (
-    <View>
+    <View style={style}>
       {label && <Label>{label}</Label>}
       <TextInput
         style={[styles.input, label ? styles.inputWithMargin : null]}

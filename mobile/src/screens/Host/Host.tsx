@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RTCView, mediaDevices, type MediaStream } from "react-native-webrtc";
@@ -12,22 +12,38 @@ import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StorageKeys } from "src/constants/StorageKeys";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "src/navigation/AppNavigationContainer";
+import { Input } from "../shared/Input";
 
 export const HostScreen = () => {
   const webSocketRef = useRef<Socket | null>(null);
   const peerRef = useRef<Peer | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [recipientId, setRecipientId] = useState<string>("");
   const { navigate } = useNavigation<NavigationProp<RootStackParamList>>();
 
   const { getItem: getClientId } = useAsyncStorage(StorageKeys.CLIENT_ID);
   const { getItem: getServerUrl } = useAsyncStorage(StorageKeys.SERVER_URL);
+  const { getItem: getRecipientId, setItem: saveRecipientId } = useAsyncStorage(
+    StorageKeys.RECIPIENT_ID
+  );
 
-  const notifyEmptyList = () => {
+  const updateRecipientId = (recId: string) => {
+    saveRecipientId(recId);
+    setRecipientId(recId);
+  };
+
+  const notifyEmptyRecipientId = () => {
+    Alert.alert("Empty recipient id", "Please enter recipient id", [
+      { text: "Ok", style: "cancel" },
+    ]);
+  };
+
+  const notifyEmptySettings = () => {
     Alert.alert(
-      "Unset server url or clientId",
-      "Please set server url or clientId in the Setting screen",
+      "Empty server url or client id",
+      "Please enter server url or client id in the Setting screen",
       [
-        { text: "Ok", style: "cancel", onPress: () => {} },
+        { text: "Ok", style: "cancel" },
         {
           text: "Go to Settings",
           style: "default",
@@ -57,7 +73,12 @@ export const HostScreen = () => {
     ]);
 
     if (!url || !clientId) {
-      notifyEmptyList();
+      notifyEmptySettings();
+      return;
+    }
+
+    if (!recipientId) {
+      notifyEmptyRecipientId();
       return;
     }
 
@@ -68,7 +89,11 @@ export const HostScreen = () => {
     const peer = new Peer();
 
     peer.onIceCandidate = (candidate) => {
-      socket.send(SocketMessageType.ICE_CANDIDATE, candidate as any);
+      socket.send(
+        SocketMessageType.ICE_CANDIDATE,
+        candidate as any,
+        recipientId
+      );
     };
 
     socket.setEventListener(SocketMessageType.ANSWER, (description) => {
@@ -86,12 +111,22 @@ export const HostScreen = () => {
 
     const offer = await peer.createOffer();
 
-    socket.send(SocketMessageType.OFFER, offer as any);
+    socket.send(SocketMessageType.OFFER, offer as any, recipientId);
 
     webSocketRef.current = socket;
     peerRef.current = peer;
     setLocalStream(stream);
   };
+
+  useLayoutEffect(() => {
+    async function init() {
+      const r = await getRecipientId();
+
+      updateRecipientId(r ?? "");
+    }
+
+    init();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -102,6 +137,13 @@ export const HostScreen = () => {
           zOrder={0}
         />
       </View>
+
+      <Input
+        style={styles.buttonPush}
+        label="Recipient id"
+        value={recipientId}
+        onChange={updateRecipientId}
+      />
 
       <Button
         style={styles.buttonPush}
