@@ -1,11 +1,10 @@
 import { useRef, useState } from "react";
-import { Text, Pressable, StyleSheet } from "react-native";
+import { Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   RTCPeerConnection,
   RTCView,
   mediaDevices,
-  type RTCSessionDescription,
   type MediaStream,
 } from "react-native-webrtc";
 
@@ -67,13 +66,22 @@ export const HostScreen = () => {
   };
 
   return (
-    <SafeAreaView style={style.container}>
-      <Pressable style={style.createSession} onPress={handleCreateSession}>
+    <SafeAreaView style={{ padding: 12 }}>
+      <Pressable
+        style={{
+          marginTop: 12,
+          paddingVertical: 4,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "grey",
+        }}
+        onPress={handleCreateSession}
+      >
         <Text>Create session</Text>
       </Pressable>
 
       <RTCView
-        style={style.rtcView}
+        style={{ width: "100%", height: 300, marginTop: 12 }}
         objectFit={"cover"}
         streamURL={localStream?.toURL() ?? ""}
         zOrder={0}
@@ -81,21 +89,3 @@ export const HostScreen = () => {
     </SafeAreaView>
   );
 };
-
-const style = StyleSheet.create({
-  container: {
-    padding: 12,
-  },
-  createSession: {
-    marginTop: 12,
-    paddingVertical: 4,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "grey",
-  },
-  rtcView: {
-    width: "100%",
-    height: 300,
-    marginTop: 12,
-  },
-});

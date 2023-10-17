@@ -1,15 +1,22 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"net/http"
+	"os"
 )
 
-var addr = flag.String("addr", "localhost:5000", "http service address")
+const (
+	Address string = "ADDRESS"
+)
 
 func main() {
-	flag.Parse()
+	address := os.Getenv(Address)
+
+	if address == "" {
+		address = ":5000"
+	}
+
 	hub := NewHub()
 	go hub.Run()
 
@@ -19,7 +26,7 @@ func main() {
 		ServeWs(hub, w, r)
 	})
 
-	err := http.ListenAndServe(*addr, mux)
+	err := http.ListenAndServe(address, mux)
 
 	if err != nil {
 		log.Fatalln("Listen and server", err)
