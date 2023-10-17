@@ -27,8 +27,9 @@ const styles = StyleSheet.create({
   input: {
     paddingVertical: 2,
     paddingHorizontal: 8,
-    borderColor: "grey",
+    borderColor: "#8457AA",
     borderWidth: 1,
+    color: "#D19DFF",
   },
   inputWithMargin: {
     marginTop: 2,

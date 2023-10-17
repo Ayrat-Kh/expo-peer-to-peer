@@ -1,11 +1,10 @@
-import React from "react";
-import { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, View } from "react-native";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 import { StorageKeys } from "src/constants/StorageKeys";
 import { Input } from "../shared/Input";
-import { StyleSheet, View } from "react-native";
 
 export const SettingsScreen = () => {
   const [serverUrl, setServerUrl] = useState<string>("");
@@ -30,15 +29,15 @@ export const SettingsScreen = () => {
 
   useLayoutEffect(() => {
     async function init() {
-      setServerUrl((await getServerUrl()) ?? "ws://localhost:5000/ws");
-      setClientId((await getClientId()) ?? "mobile-app-1");
+      setServerUrl((await getServerUrl()) ?? "");
+      setClientId((await getClientId()) ?? "");
     }
 
     init();
   }, []);
 
   return (
-    <SafeAreaView style={{ padding: 12 }}>
+    <SafeAreaView style={styles.root}>
       <Input
         label="Server url"
         value={serverUrl}
@@ -56,6 +55,11 @@ export const SettingsScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  root: {
+    padding: 12,
+    backgroundColor: "#1B1525",
+    height: "100%",
+  },
   gap: {
     marginTop: 12,
   },

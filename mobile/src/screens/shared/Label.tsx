@@ -8,6 +8,6 @@ export const Label: React.FC<React.PropsWithChildren> = ({ children }) => {
 const styles = StyleSheet.create({
   text: {
     fontSize: 12,
-    opacity: 0.5,
+    color: "#ECD9FA",
   },
 });

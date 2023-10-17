@@ -2,7 +2,7 @@ import { Path, Svg } from "react-native-svg";
 
 export const ConnectIcon = () => {
   return (
-    <Svg width={16} height={16} viewBox="0 0 24 24" color="grey">
+    <Svg width={16} height={16} viewBox="0 0 24 24" color="#D19DFF">
       <Path
         d="M5.9,24c-1.6,0-3.1-0.6-4.2-1.7C0.6,21.2,0,19.7,0,18.1c0-1.6,0.6-3.1,1.7-4.2l3.8-3.8l2,2l2.8-2.8l1.4,1.4l-2.8,2.8
 			l1.6,1.6l2.8-2.8l1.4,1.4l-2.8,2.8l2,2l-3.7,3.8C9,23.3,7.5,24,5.9,24z M5.5,12.9l-2.3,2.3C2.4,16,2,17,2,18s0.4,2,1.2,2.8
