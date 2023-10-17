@@ -28,8 +28,8 @@ export const AppNavigationContainer = () => {
         screenOptions={{
           tabBarLabelPosition: "beside-icon",
           headerStyle: {
-            backgroundColor: "#1E1523",
             shadowColor: "#8457AA",
+            backgroundColor: "#1E1523",
           },
           headerTitleAlign: "center",
           headerTitleStyle: {

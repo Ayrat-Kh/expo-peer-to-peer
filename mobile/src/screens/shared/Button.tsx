@@ -24,11 +24,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#48295C",
     borderRadius: 4,
-
-    shadowColor: "#171717",
-    shadowOffset: { width: -2, height: 4 },
-    shadowOpacity: 0.9,
-    shadowRadius: 3,
   },
   labelStyle: {
     color: "#D19DFF",
