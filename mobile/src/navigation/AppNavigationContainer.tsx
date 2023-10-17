@@ -4,8 +4,6 @@ import {
   NavigationContainer as RNNavigationContainer,
 } from "@react-navigation/native";
 
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-
 import { HostScreen } from "src/screens/Host";
 import { SettingsScreen } from "src/screens/Settings";
 import { HostIcon, SettingsIcon } from "src/components/icons";
