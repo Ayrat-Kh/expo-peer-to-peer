@@ -64,6 +64,7 @@ export class Socket {
   private messageListener(ev: MessageEvent<any>) {
     try {
       const data = JSON.parse(ev.data) as SocketMessage;
+
       const { messageType, payload } = data;
 
       if (messageType in this.handlers) {

@@ -70,17 +70,17 @@ export class Peer {
     return offer;
   }
 
-  async createAnswer(offer: RTCSessionDescription): Promise<void> {
-    if (!this.peerConnection) {
-      return;
-    }
-
+  async createAnswer(
+    offer: RTCSessionDescription
+  ): Promise<RTCSessionDescription> {
     await this.setRemoteDescription(offer);
 
     const answer: RTCSessionDescription =
       await this.peerConnection.createAnswer();
 
     await this.peerConnection.setLocalDescription(answer);
+
+    return answer;
   }
 
   async addIceCandidate(candidate: RTCIceCandidateInit): Promise<void> {

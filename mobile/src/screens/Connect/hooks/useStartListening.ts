@@ -58,9 +58,11 @@ export const useStartListening = ({
         );
         socket.setEventListener(
           SocketMessageType.OFFER,
-          (description, fromClientId) => {
+          async (description, fromClientId) => {
             senderIdRef.current = fromClientId;
-            peer.setRemoteDescription(description);
+            const answer = await peer.createAnswer(description);
+
+            socket.send(SocketMessageType.ANSWER, answer, fromClientId);
           }
         );
 
