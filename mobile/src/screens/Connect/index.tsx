@@ -28,8 +28,13 @@ export const ConnectScreen = () => {
     );
   };
 
+  const notifyError = (message: string) => {
+    Alert.alert('Error occured', message, [{ text: 'Ok', style: 'cancel' }]);
+  };
+
   const { handleStartListening, remoteStream } = useStartListening({
     notifyEmptySettings,
+    notifyError,
   });
 
   return (

@@ -17,7 +17,9 @@ export class Socket {
   async connect() {
     this.close();
 
-    const socket = new WebSocket(`${this.socketUrl}?clientId=${this.clientId}`);
+    const url = `${this.socketUrl}?clientId=${this.clientId}`;
+
+    const socket = new WebSocket(url);
 
     socket.addEventListener('message', this.messageListener.bind(this));
 

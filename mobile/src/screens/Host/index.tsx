@@ -47,9 +47,14 @@ export const HostScreen = () => {
     );
   };
 
+  const notifyError = (message: string) => {
+    Alert.alert('Error occured', message, [{ text: 'Ok', style: 'cancel' }]);
+  };
+
   const { handleCreateSession, localStream } = useCreateSession({
     notifyEmptyRecipient,
     notifyEmptySettings,
+    notifyError,
   });
 
   useLayoutEffect(() => {

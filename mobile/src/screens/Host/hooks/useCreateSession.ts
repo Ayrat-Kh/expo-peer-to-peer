@@ -10,6 +10,7 @@ import { StorageKeys } from 'src/constants/StorageKeys';
 interface UseCreateSessionParams {
   notifyEmptySettings: VoidFunction;
   notifyEmptyRecipient: VoidFunction;
+  notifyError: (message: string) => void;
 }
 
 interface UseCreateSessionResult {
@@ -25,6 +26,7 @@ const constraints = {
 export const useCreateSession = ({
   notifyEmptyRecipient,
   notifyEmptySettings,
+  notifyError,
 }: UseCreateSessionParams): UseCreateSessionResult => {
   const webSocketRef = useRef<Socket | null>(null);
   const peerRef = useRef<Peer | null>(null);
@@ -59,36 +61,43 @@ export const useCreateSession = ({
         return;
       }
 
-      const stream = await mediaDevices.getUserMedia(constraints);
+      try {
+        const stream = await mediaDevices.getUserMedia(constraints);
 
-      const socket = new Socket(url, clientId);
+        const socket = new Socket(url, clientId);
 
-      const peer = new Peer();
+        const peer = new Peer();
 
-      peer.onIceCandidate = (candidate) => {
-        socket.send(SocketMessageType.ICE_CANDIDATE, candidate, recipientId);
-      };
+        peer.onIceCandidate = (candidate) => {
+          socket.send(SocketMessageType.ICE_CANDIDATE, candidate, recipientId);
+        };
 
-      socket.setEventListener(SocketMessageType.ANSWER, (description) => {
-        peer.setRemoteDescription(description);
-      });
+        socket.setEventListener(SocketMessageType.ANSWER, (description) => {
+          peer.setRemoteDescription(description);
+        });
 
-      socket.setEventListener(SocketMessageType.ICE_CANDIDATE, (candidate) => {
-        peer.addIceCandidate(candidate);
-      });
+        socket.setEventListener(
+          SocketMessageType.ICE_CANDIDATE,
+          (candidate) => {
+            peer.addIceCandidate(candidate);
+          }
+        );
 
-      await socket.connect();
-      await peer.connect();
+        await socket.connect();
+        await peer.connect();
 
-      peer.addTrack(stream);
+        peer.addTrack(stream);
 
-      const offer = await peer.createOffer();
+        const offer = await peer.createOffer();
 
-      socket.send(SocketMessageType.OFFER, offer, recipientId);
+        socket.send(SocketMessageType.OFFER, offer, recipientId);
 
-      webSocketRef.current = socket;
-      peerRef.current = peer;
-      setLocalStream(stream);
+        webSocketRef.current = socket;
+        peerRef.current = peer;
+        setLocalStream(stream);
+      } catch (error) {
+        notifyError(`${error}`);
+      }
     }, []),
     localStream,
   };

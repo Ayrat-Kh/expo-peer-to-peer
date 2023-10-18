@@ -12,6 +12,7 @@ const (
 
 type Request struct {
 	MessageType       RequestType     `json:"messageType"`
+	SenderId          string          `json:"senderId"`
 	RecipientClientId string          `json:"recipientClientId"`
 	Payload           json.RawMessage `json:"payload"`
 }

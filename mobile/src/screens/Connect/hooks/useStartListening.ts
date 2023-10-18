@@ -9,6 +9,7 @@ import { StorageKeys } from 'src/constants/StorageKeys';
 
 interface UseStartListeningParams {
   notifyEmptySettings: VoidFunction;
+  notifyError: (message: string) => void;
 }
 
 interface UseStartListeningResult {
@@ -18,6 +19,7 @@ interface UseStartListeningResult {
 
 export const useStartListening = ({
   notifyEmptySettings,
+  notifyError,
 }: UseStartListeningParams): UseStartListeningResult => {
   const webSocketRef = useRef<Socket | null>(null);
   const senderIdRef = useRef<string>('');
@@ -28,7 +30,7 @@ export const useStartListening = ({
   const { getItem: getServerUrl } = useAsyncStorage(StorageKeys.SERVER_URL);
 
   return {
-    handleCreateSession: useCallback(async () => {
+    handleStartListening: useCallback(async () => {
       peerRef.current?.close();
       peerRef.current = null;
 
@@ -44,36 +46,42 @@ export const useStartListening = ({
         notifyEmptySettings();
         return;
       }
+      try {
+        const socket = new Socket(url, clientId);
+        webSocketRef.current = socket;
 
-      const socket = new Socket(url, clientId);
-      socket.setEventListener(SocketMessageType.ICE_CANDIDATE, (candidate) => {
-        peer.addIceCandidate(candidate);
-      });
-      socket.setEventListener(
-        SocketMessageType.OFFER,
-        (description, fromClientId) => {
-          senderIdRef.current = fromClientId;
-          peer.setRemoteDescription(description);
-        }
-      );
-
-      const peer = new Peer();
-      peer.onIceCandidate = (candidate) => {
-        socket.send(
+        socket.setEventListener(
           SocketMessageType.ICE_CANDIDATE,
-          candidate,
-          senderIdRef.current
+          (candidate) => {
+            peer.addIceCandidate(candidate);
+          }
         );
-      };
-      peer.onTrack = (streams) => {
-        setRemoteStream(streams[0]);
-      };
+        socket.setEventListener(
+          SocketMessageType.OFFER,
+          (description, fromClientId) => {
+            senderIdRef.current = fromClientId;
+            peer.setRemoteDescription(description);
+          }
+        );
 
-      await socket.connect();
-      await peer.connect();
+        const peer = new Peer();
+        peerRef.current = peer;
+        peer.onIceCandidate = (candidate) => {
+          socket.send(
+            SocketMessageType.ICE_CANDIDATE,
+            candidate,
+            senderIdRef.current
+          );
+        };
+        peer.onTrack = (streams) => {
+          setRemoteStream(streams[0]);
+        };
 
-      webSocketRef.current = socket;
-      peerRef.current = peer;
+        await socket.connect();
+        await peer.connect();
+      } catch (error) {
+        notifyError(`${error}`);
+      }
     }, []),
     remoteStream,
   };
