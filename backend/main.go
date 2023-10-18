@@ -11,11 +11,13 @@ const (
 )
 
 func main() {
+
 	address := os.Getenv(Address)
 
 	if address == "" {
 		address = ":5000"
 	}
+	log.Printf("Starting app at %s", address)
 
 	hub := NewHub()
 	go hub.Run()
