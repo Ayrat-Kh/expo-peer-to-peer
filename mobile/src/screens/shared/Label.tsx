@@ -1,13 +1,9 @@
-import React from "react";
-import { Text, StyleSheet } from "react-native";
+import React from 'react';
+import { Text } from 'react-native';
+import { styled } from 'nativewind';
+
+const StyledLabel = styled(Text, 'text-xs text-secondary');
 
 export const Label: React.FC<React.PropsWithChildren> = ({ children }) => {
-  return <Text style={styles.text}>{children}</Text>;
+  return <StyledLabel>{children}</StyledLabel>;
 };
-
-const styles = StyleSheet.create({
-  text: {
-    fontSize: 12,
-    color: "#ECD9FA",
-  },
-});
