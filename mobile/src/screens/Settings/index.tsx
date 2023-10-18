@@ -1,12 +1,9 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { styled } from 'nativewind';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 import { StorageKeys } from 'src/constants/StorageKeys';
 import { Input } from '../shared/Input';
-
-const StyledSafeAreaView = styled(SafeAreaView, 'bg-primary p-3 h-full');
+import { ScreenLayout } from '../shared/ScreenLayout';
 
 export const SettingsScreen = () => {
   const [serverUrl, setServerUrl] = useState<string>('');
@@ -39,7 +36,7 @@ export const SettingsScreen = () => {
   }, []);
 
   return (
-    <StyledSafeAreaView>
+    <ScreenLayout>
       <Input
         label="Server url"
         value={serverUrl}
@@ -52,6 +49,6 @@ export const SettingsScreen = () => {
         value={clientId}
         onChange={handleClientIdChange}
       />
-    </StyledSafeAreaView>
+    </ScreenLayout>
   );
 };

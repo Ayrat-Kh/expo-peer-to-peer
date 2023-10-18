@@ -1,8 +1,6 @@
 import { useLayoutEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { RTCView } from 'react-native-webrtc';
-import { styled } from 'nativewind';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 import { Button } from '../shared/Button';
@@ -11,8 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { RootNavigationProps } from 'src/navigation/AppNavigationContainer';
 import { Input } from '../shared/Input';
 import { useCreateSession } from './hooks/useCreateSession';
-
-const StyledContainer = styled(SafeAreaView, 'bg-primary h-full p-4');
+import { ScreenLayout } from '../shared/ScreenLayout';
 
 export const HostScreen = () => {
   const [recipientId, setRecipientId] = useState<string>('');
@@ -65,7 +62,7 @@ export const HostScreen = () => {
   }, []);
 
   return (
-    <StyledContainer>
+    <ScreenLayout>
       <RTCView
         tw="w-full h-[350]"
         objectFit={'cover'}
@@ -85,6 +82,6 @@ export const HostScreen = () => {
         label={'Create session'}
         onPress={handleCreateSession}
       />
-    </StyledContainer>
+    </ScreenLayout>
   );
 };

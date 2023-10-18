@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -23,6 +24,16 @@ func main() {
 	go hub.Run()
 
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		res, _ := json.Marshal(map[string]string{
+			"message": "server is working fine",
+		})
+
+		// w.Write(res)
+
+		w.Write(res)
+	})
 
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		ServeWs(hub, w, r)

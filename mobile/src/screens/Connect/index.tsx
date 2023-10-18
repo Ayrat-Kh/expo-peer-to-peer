@@ -1,15 +1,12 @@
 import React from 'react';
 import { Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { RTCView } from 'react-native-webrtc';
-import { styled } from 'nativewind';
 import { useNavigation } from '@react-navigation/native';
 
 import { Button } from '../shared/Button';
 import type { RootNavigationProps } from 'src/navigation/AppNavigationContainer';
 import { useStartListening } from './hooks/useStartListening';
-
-const StyledContainer = styled(SafeAreaView, 'bg-primary h-full p-4');
+import { ScreenLayout } from '../shared/ScreenLayout';
 
 export const ConnectScreen = () => {
   const { navigate } = useNavigation<RootNavigationProps>();
@@ -36,7 +33,7 @@ export const ConnectScreen = () => {
   });
 
   return (
-    <StyledContainer>
+    <ScreenLayout>
       <RTCView
         tw="w-full h-[350]"
         objectFit={'cover'}
@@ -45,6 +42,6 @@ export const ConnectScreen = () => {
       />
 
       <Button tw="mt-3" label={'Listen'} onPress={handleStartListening} />
-    </StyledContainer>
+    </ScreenLayout>
   );
 };
