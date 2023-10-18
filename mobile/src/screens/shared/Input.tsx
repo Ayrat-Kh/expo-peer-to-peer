@@ -17,7 +17,7 @@ const StyledInput = styled(
   'bg-secondary rounded-md text-primaryContrast border border-primary focus:border-primary-active py-1 px-2 text-sm'
 );
 
-export const Input: React.FC<InputProps> = ({
+const InputInner: React.FC<InputProps> = ({
   label,
   style,
   value,
@@ -34,3 +34,5 @@ export const Input: React.FC<InputProps> = ({
     </StyledContainer>
   );
 };
+
+export const Input = styled(InputInner);

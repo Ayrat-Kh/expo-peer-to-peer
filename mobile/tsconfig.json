@@ -7,5 +7,5 @@
       "@peer-lib/*": ["../peer-lib/*"]
     }
   },
-  "include": ["./*", "../peer-lib/*"]
+  "include": ["./*", "../peer-lib/*", "src/my-app.d.ts"]
 }

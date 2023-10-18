@@ -4,6 +4,8 @@ import { styled } from 'nativewind';
 
 const StyledLabel = styled(Text, 'text-xs text-secondary');
 
-export const Label: React.FC<React.PropsWithChildren> = ({ children }) => {
+const LabelInner: React.FC<React.PropsWithChildren> = ({ children }) => {
   return <StyledLabel>{children}</StyledLabel>;
 };
+
+export const Label = styled(LabelInner);
