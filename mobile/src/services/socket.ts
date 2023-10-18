@@ -3,7 +3,7 @@ import {
   SocketMessageType,
   SocketMessageTypeHandlers,
   SocketMessageTypeMapping,
-} from "../types/peer";
+} from 'src/types/peer';
 
 export class Socket {
   handlers: Partial<SocketMessageTypeHandlers> = {};
@@ -19,7 +19,7 @@ export class Socket {
 
     const socket = new WebSocket(`${this.socketUrl}?clientId=${this.clientId}`);
 
-    socket.addEventListener("message", this.messageListener.bind(this));
+    socket.addEventListener('message', this.messageListener.bind(this));
 
     await new Promise<void>((resolve) => {
       if (socket.readyState === WebSocket.OPEN) {
@@ -67,10 +67,10 @@ export class Socket {
       if (messageType in this.handlers) {
         this.handlers[messageType]?.(payload, data.senderId);
       } else {
-        console.log("Unknown message type", data);
+        console.log('Unknown message type', data);
       }
     } catch (e) {
-      console.log("Unknown message or error", e);
+      console.log('Unknown message or error', e);
     }
   }
 }

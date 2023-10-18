@@ -3,9 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "src/*": ["./src/*"],
-      "@peer-lib/*": ["../peer-lib/*"]
+      "src/*": ["./src/*"]
     }
   },
-  "include": ["./*", "../peer-lib/*", "src/my-app.d.ts"]
+  "include": ["./*", "src/my-app.d.ts"]
 }
