@@ -1,7 +1,7 @@
+import React from 'react';
 import { Text, View } from 'react-native';
 import { styled } from 'nativewind';
-import React from 'react';
-import { BottomTabHeaderProps } from '@react-navigation/bottom-tabs';
+import type { BottomTabHeaderProps } from '@react-navigation/bottom-tabs';
 
 const Container = styled(
   View,

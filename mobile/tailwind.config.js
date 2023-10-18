@@ -60,7 +60,7 @@ module.exports = {
         secondaryContrast: greyPalette[12],
       },
       backgroundColor: {
-        primary: greyPalette[1],
+        primary: accentPalette[1],
         secondary: greyPalette[2],
 
         componentPrimary: accentPalette[9],
@@ -76,6 +76,18 @@ module.exports = {
         secondary: accentPalette[7],
       },
       textColor: {
+        primary: accentPalette[11],
+        primaryContrast: accentPalette[12],
+        secondary: greyPalette[11],
+        secondaryContrast: greyPalette[12],
+      },
+      fill: {
+        primary: accentPalette[11],
+        primaryContrast: accentPalette[12],
+        secondary: greyPalette[11],
+        secondaryContrast: greyPalette[12],
+      },
+      stroke: {
         primary: accentPalette[11],
         primaryContrast: accentPalette[12],
         secondary: greyPalette[11],

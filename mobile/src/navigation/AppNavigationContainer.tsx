@@ -1,18 +1,24 @@
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
-  NavigationProp,
+  type NavigationProp,
   NavigationContainer as RNNavigationContainer,
 } from '@react-navigation/native';
 
+import { ConnectScreen } from 'src/screens/Connect';
 import { HostScreen } from 'src/screens/Host';
 import { SettingsScreen } from 'src/screens/Settings';
-import { HostIcon, SettingsIcon } from 'src/components/icons';
-import React from 'react';
-import { HeaderBar } from '../screens/shared/Navigation/Header';
+import { ConnectIcon, HostIcon, SettingsIcon } from 'src/components/icons';
+import { HeaderBar } from 'src/screens/shared/Navigation/Header';
+import {
+  TabBarLabel,
+  TabBarButton,
+} from 'src/screens/shared/Navigation/TabBar';
 
 export type RootStackParamList = {
   Home: undefined;
   Settings: undefined;
+  Connect: undefined;
 };
 
 export type HomeScreenProps = NavigationProp<RootStackParamList>;
@@ -30,15 +36,8 @@ export const AppNavigationContainer = () => {
         screenOptions={{
           tabBarLabelPosition: 'beside-icon',
           header: HeaderBar,
-
-          tabBarStyle: {
-            backgroundColor: '#1E1523',
-            shadowColor: '#8457AA',
-          },
-          tabBarLabelStyle: {
-            color: '#ECD9FA',
-          },
-          tabBarActiveBackgroundColor: '#48295C',
+          tabBarButton: TabBarButton,
+          tabBarLabel: TabBarLabel,
         }}
         backBehavior="firstRoute"
       >
@@ -48,6 +47,13 @@ export const AppNavigationContainer = () => {
           }}
           name="Home"
           component={HostScreen}
+        />
+        <Tab.Screen
+          name="Connect"
+          component={ConnectScreen}
+          options={{
+            tabBarIcon: ConnectIcon,
+          }}
         />
         <Tab.Screen
           name="Settings"
