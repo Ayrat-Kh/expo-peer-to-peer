@@ -1,30 +1,18 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { RTCView, mediaDevices, type MediaStream } from 'react-native-webrtc';
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import { RTCView } from 'react-native-webrtc';
 import { styled } from 'nativewind';
 import { useNavigation } from '@react-navigation/native';
 
-import { Socket } from 'src/services/socket';
-import { Peer } from 'src/services/peer';
-import { SocketMessageType } from 'src/types/peer';
 import { Button } from '../shared/Button';
-import { StorageKeys } from 'src/constants/StorageKeys';
 import type { RootNavigationProps } from 'src/navigation/AppNavigationContainer';
+import { useStartListening } from './hooks/useStartListening';
 
 const StyledContainer = styled(SafeAreaView, 'bg-primary h-full p-4');
 
 export const HostScreen = () => {
-  const webSocketRef = useRef<Socket | null>(null);
-  const peerRef = useRef<Peer | null>(null);
-  const fromClientIdRef = useRef<string>('');
-  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-
   const { navigate } = useNavigation<RootNavigationProps>();
-
-  const { getItem: getClientId } = useAsyncStorage(StorageKeys.CLIENT_ID);
-  const { getItem: getServerUrl } = useAsyncStorage(StorageKeys.SERVER_URL);
 
   const notifyEmptySettings = () => {
     Alert.alert(
@@ -43,73 +31,20 @@ export const HostScreen = () => {
     );
   };
 
-  const handleCreateSession = async () => {
-    peerRef.current?.close();
-    peerRef.current = null;
-
-    webSocketRef.current?.close();
-    webSocketRef.current = null;
-
-    const constraints = {
-      audio: true,
-      video: true,
-    };
-
-    const [url, clientId] = await Promise.all([
-      await getServerUrl(),
-      await getClientId(),
-    ]);
-
-    if (!url || !clientId) {
-      notifyEmptySettings();
-      return;
-    }
-
-    const stream = await mediaDevices.getUserMedia(constraints);
-
-    const socket = new Socket(url, clientId);
-
-    const peer = new Peer();
-
-    peer.onIceCandidate = (candidate) => {
-      socket.send(SocketMessageType.ICE_CANDIDATE, candidate, recipientId);
-    };
-
-    socket.setEventListener(
-      SocketMessageType.ANSWER,
-      (description, fromClientId) => {
-        peer.setRemoteDescription(description);
-      }
-    );
-
-    socket.setEventListener(SocketMessageType.ICE_CANDIDATE, (candidate) => {
-      peer.addIceCandidate(candidate);
-    });
-
-    await socket.connect();
-    await peer.connect();
-
-    peer.addTrack(stream);
-
-    const offer = await peer.createOffer();
-
-    socket.send(SocketMessageType.OFFER, offer, recipientId);
-
-    webSocketRef.current = socket;
-    peerRef.current = peer;
-    setLocalStream(stream);
-  };
+  const { handleStartListening, remoteStream } = useStartListening({
+    notifyEmptySettings,
+  });
 
   return (
     <StyledContainer>
       <RTCView
         tw="w-full h-[350]"
         objectFit={'cover'}
-        streamURL={localStream?.toURL() ?? ''}
+        streamURL={remoteStream?.toURL() ?? ''}
         zOrder={0}
       />
 
-      <Button tw="mt-3" label={'Listen'} onPress={handleCreateSession} />
+      <Button tw="mt-3" label={'Listen'} onPress={handleStartListening} />
     </StyledContainer>
   );
 };

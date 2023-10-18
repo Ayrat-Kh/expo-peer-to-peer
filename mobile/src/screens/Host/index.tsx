@@ -58,7 +58,6 @@ export const ConnectScreen = () => {
   useLayoutEffect(() => {
     async function init() {
       const r = await getRecipientId();
-
       updateRecipientId(r ?? '');
     }
 
