@@ -11,7 +11,7 @@ import { useStartListening } from './hooks/useStartListening';
 
 const StyledContainer = styled(SafeAreaView, 'bg-primary h-full p-4');
 
-export const HostScreen = () => {
+export const ConnectScreen = () => {
   const { navigate } = useNavigation<RootNavigationProps>();
 
   const notifyEmptySettings = () => {

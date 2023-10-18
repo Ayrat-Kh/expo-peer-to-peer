@@ -16,7 +16,7 @@ import {
 } from 'src/screens/shared/Navigation/TabBar';
 
 export type RootStackParamList = {
-  Home: undefined;
+  Host: undefined;
   Settings: undefined;
   Connect: undefined;
 };
@@ -48,7 +48,7 @@ export const AppNavigationContainer = () => {
           options={{
             tabBarIcon: HostIcon,
           }}
-          name="Home"
+          name="Host"
           component={HostScreen}
         />
         <Tab.Screen

@@ -14,7 +14,7 @@ import { useCreateSession } from './hooks/useCreateSession';
 
 const StyledContainer = styled(SafeAreaView, 'bg-primary h-full p-4');
 
-export const ConnectScreen = () => {
+export const HostScreen = () => {
   const [recipientId, setRecipientId] = useState<string>('');
   const { navigate } = useNavigation<RootNavigationProps>();
 
