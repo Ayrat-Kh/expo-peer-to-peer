@@ -38,6 +38,9 @@ export const AppNavigationContainer = () => {
           header: HeaderBar,
           tabBarButton: TabBarButton,
           tabBarLabel: TabBarLabel,
+          tabBarStyle: {
+            borderTopWidth: 0,
+          },
         }}
         backBehavior="firstRoute"
       >

@@ -6,7 +6,7 @@ import type {
   BottomTabBarButtonProps,
 } from '@react-navigation/bottom-tabs/src/types';
 
-const StyledTabBarLabel = styled(Text, 'text-center text-primary left-4');
+const StyledTabBarLabel = styled(Text, 'text-center text-primary left-4 ');
 
 export const TabBarLabel: React.FC<{
   focused: boolean;
@@ -15,7 +15,7 @@ export const TabBarLabel: React.FC<{
   children: string;
 }> = ({ focused, children }) => {
   return (
-    <StyledTabBarLabel tw={focused ? 'text-semibold' : ''}>
+    <StyledTabBarLabel tw={focused ? 'font-semibold' : ''}>
       {children}
     </StyledTabBarLabel>
   );
