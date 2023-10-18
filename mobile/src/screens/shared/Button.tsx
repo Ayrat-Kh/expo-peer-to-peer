@@ -18,7 +18,7 @@ const StyledText = styled(
   'text-secondaryContrast font-semibold text-center'
 );
 
-export const Button: React.FC<ButtonProps> = ({ style, onPress, label }) => {
+const ButtonInner: React.FC<ButtonProps> = ({ style, onPress, label }) => {
   return (
     <TouchableOpacity style={style} onPress={onPress}>
       <StyledView>
@@ -27,3 +27,5 @@ export const Button: React.FC<ButtonProps> = ({ style, onPress, label }) => {
     </TouchableOpacity>
   );
 };
+
+export const Button = styled(ButtonInner);

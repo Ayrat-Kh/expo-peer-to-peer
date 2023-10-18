@@ -21,7 +21,7 @@ export type RootStackParamList = {
   Connect: undefined;
 };
 
-export type HomeScreenProps = NavigationProp<RootStackParamList>;
+export type RootNavigationProps = NavigationProp<RootStackParamList>;
 export type SettingsScreenProps = NavigationProp<
   RootStackParamList,
   'Settings'

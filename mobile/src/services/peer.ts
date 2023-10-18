@@ -3,19 +3,19 @@ import {
   type RTCIceCandidate,
   type MediaStream,
   type RTCSessionDescription,
-} from "react-native-webrtc";
+} from 'react-native-webrtc';
 
 type PeerConnection = Pick<
   RTCPeerConnection,
-  | "addEventListener"
-  | "addTrack"
-  | "addIceCandidate"
-  | "createAnswer"
-  | "createOffer"
-  | "setLocalDescription"
-  | "setRemoteDescription"
-  | "setConfiguration"
-  | "close"
+  | 'addEventListener'
+  | 'addTrack'
+  | 'addIceCandidate'
+  | 'createAnswer'
+  | 'createOffer'
+  | 'setLocalDescription'
+  | 'setRemoteDescription'
+  | 'setConfiguration'
+  | 'close'
 >;
 
 export class Peer {
@@ -33,20 +33,20 @@ export class Peer {
     this.peerConnection = new RTCPeerConnection({
       iceServers: [
         {
-          urls: "stun:stun.l.google.com:19302",
+          urls: 'stun:stun.l.google.com:19302',
         },
       ],
     });
   }
 
   async connect() {
-    this.peerConnection.addEventListener("icecandidate", (event) => {
+    this.peerConnection.addEventListener('icecandidate', (event) => {
       if (event.candidate) {
         this.onIceCandidate?.(event.candidate);
       }
     });
 
-    this.peerConnection.addEventListener("track", (event) => {
+    this.peerConnection.addEventListener('track', (event) => {
       if (event.streams) {
         this.onTrack?.(event.streams);
       }
