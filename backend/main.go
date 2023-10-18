@@ -30,12 +30,11 @@ func main() {
 			"message": "server is working fine",
 		})
 
-		// w.Write(res)
-
 		w.Write(res)
 	})
 
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Call ws")
 		ServeWs(hub, w, r)
 	})
 
