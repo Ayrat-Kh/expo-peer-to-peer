@@ -26,9 +26,9 @@ export const ScreenLayout: React.FC<React.PropsWithChildren> = ({
           default: undefined,
         })}
       >
-        <SafeAreaView>
-          <StyledContainer>{children}</StyledContainer>
-        </SafeAreaView>
+        <StyledContainer>
+          <SafeAreaView>{children}</SafeAreaView>
+        </StyledContainer>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
