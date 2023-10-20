@@ -5,6 +5,7 @@ import type {
   LabelPosition,
   BottomTabBarButtonProps,
 } from '@react-navigation/bottom-tabs/src/types';
+import colorPalette from 'src/design-system/colors';
 
 const StyledTabBarLabel = styled(Text, 'text-center text-primary left-4 ');
 
@@ -31,7 +32,10 @@ export const TabBarButton: React.FC<BottomTabBarButtonProps> = ({
   children,
 }) => {
   return (
-    <StyledTabBarButtonContainer onPress={onPress}>
+    <StyledTabBarButtonContainer
+      underlayColor={colorPalette.backgroundColor['componentPrimary-active']}
+      onPress={onPress}
+    >
       {children}
     </StyledTabBarButtonContainer>
   );

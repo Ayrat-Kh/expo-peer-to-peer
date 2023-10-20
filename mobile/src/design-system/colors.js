@@ -47,7 +47,8 @@ const greyPalette = {
   12: '#EEEEF0',
 };
 
-export const colors = {
+// /** @type {import('tailwindcss').Config['theme']} */
+module.exports = {
   colors: {
     primary: accentPalette[11],
     primaryContrast: accentPalette[12],
@@ -57,7 +58,7 @@ export const colors = {
   },
   backgroundColor: {
     primary: accentPalette[1],
-    secondary: greyPalette[2],
+    secondary: greyPalette[1],
 
     componentPrimary: accentPalette[9],
     'componentPrimary-active': accentPalette[10],
