@@ -14,6 +14,7 @@ interface UseStartListeningParams {
 
 interface UseStartListeningResult {
   handleStartListening: () => Promise<void>;
+  handleDisconnect: () => void;
   remoteStream: MediaStream | null;
 }
 
@@ -29,13 +30,19 @@ export const useStartListening = ({
   const { getItem: getClientId } = useAsyncStorage(StorageKeys.CLIENT_ID);
   const { getItem: getServerUrl } = useAsyncStorage(StorageKeys.SERVER_URL);
 
+  const handleDisconnect = useCallback(() => {
+    setRemoteStream(null);
+
+    peerRef.current?.close();
+    peerRef.current = null;
+
+    webSocketRef.current?.close();
+    webSocketRef.current = null;
+  }, []);
+
   return {
     handleStartListening: useCallback(async () => {
-      peerRef.current?.close();
-      peerRef.current = null;
-
-      webSocketRef.current?.close();
-      webSocketRef.current = null;
+      handleDisconnect();
 
       const [url, clientId] = await Promise.all([
         await getServerUrl(),
@@ -84,7 +91,8 @@ export const useStartListening = ({
       } catch (error) {
         notifyError(`${error}`);
       }
-    }, []),
+    }, [handleDisconnect]),
+    handleDisconnect,
     remoteStream,
   };
 };

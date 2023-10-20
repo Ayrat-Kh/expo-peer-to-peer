@@ -15,6 +15,7 @@ interface UseCreateSessionParams {
 
 interface UseCreateSessionResult {
   handleCreateSession: () => Promise<void>;
+  handleDisconnect: () => void;
   localStream: MediaStream | null;
 }
 
@@ -36,13 +37,20 @@ export const useCreateSession = ({
   const { getItem: getServerUrl } = useAsyncStorage(StorageKeys.SERVER_URL);
   const { getItem: getRecipientId } = useAsyncStorage(StorageKeys.RECIPIENT_ID);
 
-  return {
-    handleCreateSession: useCallback(async () => {
-      peerRef.current?.close();
-      peerRef.current = null;
+  const handleDisconnect = useCallback(() => {
+    setLocalStream(null);
 
-      webSocketRef.current?.close();
-      webSocketRef.current = null;
+    peerRef.current?.close();
+    peerRef.current = null;
+
+    webSocketRef.current?.close();
+    webSocketRef.current = null;
+  }, []);
+
+  return {
+    handleDisconnect,
+    handleCreateSession: useCallback(async () => {
+      handleDisconnect();
 
       const recipientId = await getRecipientId();
 
@@ -98,7 +106,7 @@ export const useCreateSession = ({
       } catch (error) {
         notifyError(`${error}`);
       }
-    }, []),
+    }, [handleDisconnect]),
     localStream,
   };
 };

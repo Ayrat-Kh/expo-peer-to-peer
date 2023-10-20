@@ -32,10 +32,11 @@ export const ConnectScreen = () => {
     Alert.alert('Error occured', message, [{ text: 'Ok', style: 'cancel' }]);
   };
 
-  const { handleStartListening, remoteStream } = useStartListening({
-    notifyEmptySettings,
-    notifyError,
-  });
+  const { handleStartListening, handleDisconnect, remoteStream } =
+    useStartListening({
+      notifyEmptySettings,
+      notifyError,
+    });
 
   return (
     <ScreenLayout>
@@ -46,7 +47,11 @@ export const ConnectScreen = () => {
         zOrder={0}
       />
 
-      <Button tw="mt-3" label={'Listen'} onPress={handleStartListening} />
+      <Button
+        tw="mt-3"
+        label={remoteStream ? 'Disconnect' : 'Listen'}
+        onPress={remoteStream ? handleDisconnect : handleStartListening}
+      />
     </ScreenLayout>
   );
 };

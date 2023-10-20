@@ -1,9 +1,11 @@
 import React from 'react';
 import { styled } from 'nativewind';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 
@@ -13,15 +15,21 @@ export const ScreenLayout: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   return (
-    <StyledContainer>
-      <KeyboardAvoidingView
-        behavior={Platform.select({
-          ios: 'padding',
-          default: undefined,
-        })}
-      >
-        <SafeAreaView>{children}</SafeAreaView>
-      </KeyboardAvoidingView>
-    </StyledContainer>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
+      <StyledContainer>
+        <KeyboardAvoidingView
+          behavior={Platform.select({
+            ios: 'padding',
+            default: undefined,
+          })}
+        >
+          <SafeAreaView>{children}</SafeAreaView>
+        </KeyboardAvoidingView>
+      </StyledContainer>
+    </TouchableWithoutFeedback>
   );
 };

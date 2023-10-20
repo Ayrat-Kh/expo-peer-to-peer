@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { styled } from 'nativewind';
 import type { BottomTabHeaderProps } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Container = styled(
   View,
@@ -11,8 +12,10 @@ const Container = styled(
 const Title = styled(Text, 'text-primary font-semibold text-2xl');
 
 export const HeaderBar: React.FC<BottomTabHeaderProps> = ({ route }) => {
+  const { top } = useSafeAreaInsets();
+
   return (
-    <Container>
+    <Container style={{ paddingTop: top }}>
       <Title>{route.name}</Title>
     </Container>
   );

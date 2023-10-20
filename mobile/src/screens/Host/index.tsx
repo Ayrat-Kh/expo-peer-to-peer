@@ -51,11 +51,12 @@ export const HostScreen = () => {
     Alert.alert('Error occured', message, [{ text: 'Ok', style: 'cancel' }]);
   };
 
-  const { handleCreateSession, localStream } = useCreateSession({
-    notifyEmptyRecipient,
-    notifyEmptySettings,
-    notifyError,
-  });
+  const { handleCreateSession, handleDisconnect, localStream } =
+    useCreateSession({
+      notifyEmptyRecipient,
+      notifyEmptySettings,
+      notifyError,
+    });
 
   useLayoutEffect(() => {
     async function init() {
@@ -84,8 +85,8 @@ export const HostScreen = () => {
 
       <Button
         tw="mt-3"
-        label={'Create session'}
-        onPress={handleCreateSession}
+        label={localStream ? 'Stop session' : 'Create session'}
+        onPress={localStream ? handleDisconnect : handleCreateSession}
       />
     </ScreenLayout>
   );
