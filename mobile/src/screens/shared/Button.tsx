@@ -10,7 +10,7 @@ export interface ButtonProps {
 
 const StyledView = styled(
   View,
-  'rounded-md bg-componentPrimary py-2 px-3 active:bg-componentPrimary-hover'
+  'rounded-md bg-componentPrimary py-2 px-3 active:bg-componentPrimary-active'
 );
 
 const StyledText = styled(

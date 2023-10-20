@@ -40,58 +40,57 @@ export const useStartListening = ({
     webSocketRef.current = null;
   }, []);
 
-  return {
-    handleStartListening: useCallback(async () => {
-      handleDisconnect();
+  const handleStartListening = useCallback(async () => {
+    handleDisconnect();
 
-      const [url, clientId] = await Promise.all([
-        await getServerUrl(),
-        await getClientId(),
-      ]);
+    const [url, clientId] = await Promise.all([
+      await getServerUrl(),
+      await getClientId(),
+    ]);
 
-      if (!url || !clientId) {
-        notifyEmptySettings();
-        return;
-      }
-      try {
-        const socket = new Socket(url, clientId);
-        webSocketRef.current = socket;
+    if (!url || !clientId) {
+      notifyEmptySettings();
+      return;
+    }
+    try {
+      const socket = new Socket(url, clientId);
+      webSocketRef.current = socket;
 
-        socket.setEventListener(
+      socket.setEventListener(SocketMessageType.ICE_CANDIDATE, (candidate) => {
+        peer.addIceCandidate(candidate);
+      });
+      socket.setEventListener(
+        SocketMessageType.OFFER,
+        async (description, fromClientId) => {
+          senderIdRef.current = fromClientId;
+          const answer = await peer.createAnswer(description);
+
+          socket.send(SocketMessageType.ANSWER, answer, fromClientId);
+        }
+      );
+
+      const peer = new Peer();
+      peerRef.current = peer;
+      peer.onIceCandidate = (candidate) => {
+        socket.send(
           SocketMessageType.ICE_CANDIDATE,
-          (candidate) => {
-            peer.addIceCandidate(candidate);
-          }
+          candidate,
+          senderIdRef.current
         );
-        socket.setEventListener(
-          SocketMessageType.OFFER,
-          async (description, fromClientId) => {
-            senderIdRef.current = fromClientId;
-            const answer = await peer.createAnswer(description);
+      };
+      peer.onTrack = (streams) => {
+        setRemoteStream(streams[0]);
+      };
 
-            socket.send(SocketMessageType.ANSWER, answer, fromClientId);
-          }
-        );
+      await socket.connect();
+      await peer.connect();
+    } catch (error) {
+      notifyError(`${error}`);
+    }
+  }, [handleDisconnect]);
 
-        const peer = new Peer();
-        peerRef.current = peer;
-        peer.onIceCandidate = (candidate) => {
-          socket.send(
-            SocketMessageType.ICE_CANDIDATE,
-            candidate,
-            senderIdRef.current
-          );
-        };
-        peer.onTrack = (streams) => {
-          setRemoteStream(streams[0]);
-        };
-
-        await socket.connect();
-        await peer.connect();
-      } catch (error) {
-        notifyError(`${error}`);
-      }
-    }, [handleDisconnect]),
+  return {
+    handleStartListening,
     handleDisconnect,
     remoteStream,
   };

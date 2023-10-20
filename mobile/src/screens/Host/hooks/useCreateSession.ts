@@ -47,66 +47,65 @@ export const useCreateSession = ({
     webSocketRef.current = null;
   }, []);
 
+  const handleCreateSession = useCallback(async () => {
+    handleDisconnect();
+
+    const recipientId = await getRecipientId();
+
+    const [url, clientId] = await Promise.all([
+      await getServerUrl(),
+      await getClientId(),
+    ]);
+
+    if (!url || !clientId) {
+      notifyEmptySettings();
+      return;
+    }
+
+    if (!recipientId) {
+      notifyEmptyRecipient();
+      return;
+    }
+
+    try {
+      const stream = await mediaDevices.getUserMedia(constraints);
+
+      const socket = new Socket(url, clientId);
+
+      const peer = new Peer();
+
+      peer.onIceCandidate = (candidate) => {
+        socket.send(SocketMessageType.ICE_CANDIDATE, candidate, recipientId);
+      };
+
+      socket.setEventListener(SocketMessageType.ANSWER, (description) => {
+        peer.setRemoteDescription(description);
+      });
+
+      socket.setEventListener(SocketMessageType.ICE_CANDIDATE, (candidate) => {
+        peer.addIceCandidate(candidate);
+      });
+
+      await socket.connect();
+      await peer.connect();
+
+      peer.addTrack(stream);
+
+      const offer = await peer.createOffer();
+
+      socket.send(SocketMessageType.OFFER, offer, recipientId);
+
+      webSocketRef.current = socket;
+      peerRef.current = peer;
+      setLocalStream(stream);
+    } catch (error) {
+      notifyError(`${error}`);
+    }
+  }, [handleDisconnect]);
+
   return {
     handleDisconnect,
-    handleCreateSession: useCallback(async () => {
-      handleDisconnect();
-
-      const recipientId = await getRecipientId();
-
-      const [url, clientId] = await Promise.all([
-        await getServerUrl(),
-        await getClientId(),
-      ]);
-
-      if (!url || !clientId) {
-        notifyEmptySettings();
-        return;
-      }
-
-      if (!recipientId) {
-        notifyEmptyRecipient();
-        return;
-      }
-
-      try {
-        const stream = await mediaDevices.getUserMedia(constraints);
-
-        const socket = new Socket(url, clientId);
-
-        const peer = new Peer();
-
-        peer.onIceCandidate = (candidate) => {
-          socket.send(SocketMessageType.ICE_CANDIDATE, candidate, recipientId);
-        };
-
-        socket.setEventListener(SocketMessageType.ANSWER, (description) => {
-          peer.setRemoteDescription(description);
-        });
-
-        socket.setEventListener(
-          SocketMessageType.ICE_CANDIDATE,
-          (candidate) => {
-            peer.addIceCandidate(candidate);
-          }
-        );
-
-        await socket.connect();
-        await peer.connect();
-
-        peer.addTrack(stream);
-
-        const offer = await peer.createOffer();
-
-        socket.send(SocketMessageType.OFFER, offer, recipientId);
-
-        webSocketRef.current = socket;
-        peerRef.current = peer;
-        setLocalStream(stream);
-      } catch (error) {
-        notifyError(`${error}`);
-      }
-    }, [handleDisconnect]),
+    handleCreateSession,
     localStream,
   };
 };

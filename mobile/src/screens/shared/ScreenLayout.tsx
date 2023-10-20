@@ -5,11 +5,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  ScrollView,
   TouchableWithoutFeedback,
-  View,
 } from 'react-native';
 
-const StyledContainer = styled(View, 'bg-primary h-full p-4');
+const StyledContainer = styled(ScrollView, 'bg-primary h-full p-4');
 
 export const ScreenLayout: React.FC<React.PropsWithChildren> = ({
   children,
@@ -20,16 +20,16 @@ export const ScreenLayout: React.FC<React.PropsWithChildren> = ({
         Keyboard.dismiss();
       }}
     >
-      <StyledContainer>
-        <KeyboardAvoidingView
-          behavior={Platform.select({
-            ios: 'padding',
-            default: undefined,
-          })}
-        >
-          <SafeAreaView>{children}</SafeAreaView>
-        </KeyboardAvoidingView>
-      </StyledContainer>
+      <KeyboardAvoidingView
+        behavior={Platform.select({
+          ios: 'padding',
+          default: undefined,
+        })}
+      >
+        <SafeAreaView>
+          <StyledContainer>{children}</StyledContainer>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 };
