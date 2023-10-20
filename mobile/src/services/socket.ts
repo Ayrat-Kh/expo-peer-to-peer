@@ -7,6 +7,7 @@ import {
 
 export class Socket {
   handlers: Partial<SocketMessageTypeHandlers> = {};
+  closeListener: VoidFunction | null = null;
   socket: WebSocket | undefined;
 
   constructor(
@@ -54,6 +55,14 @@ export class Socket {
     handler: SocketMessageTypeHandlers[Type]
   ) {
     this.handlers[messageType] = handler;
+  }
+
+  setCloseListener(handler: VoidFunction) {
+    if (this.closeListener) {
+      this.socket?.removeEventListener('close', this.closeListener);
+    }
+
+    this.socket?.addEventListener('close', handler);
   }
 
   close() {

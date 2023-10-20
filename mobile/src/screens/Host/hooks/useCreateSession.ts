@@ -17,6 +17,7 @@ interface UseCreateSessionResult {
   handleCreateSession: () => Promise<void>;
   handleDisconnect: () => void;
   localStream: MediaStream | null;
+  connected: boolean;
 }
 
 const constraints = {
@@ -32,12 +33,15 @@ export const useCreateSession = ({
   const webSocketRef = useRef<Socket | null>(null);
   const peerRef = useRef<Peer | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [connected, setConnected] = useState<boolean>(false);
 
   const { getItem: getClientId } = useAsyncStorage(StorageKeys.CLIENT_ID);
   const { getItem: getServerUrl } = useAsyncStorage(StorageKeys.SERVER_URL);
   const { getItem: getRecipientId } = useAsyncStorage(StorageKeys.RECIPIENT_ID);
 
   const handleDisconnect = useCallback(() => {
+    setConnected(false);
+
     setLocalStream(null);
 
     peerRef.current?.close();
@@ -86,6 +90,8 @@ export const useCreateSession = ({
         peer.addIceCandidate(candidate);
       });
 
+      socket.setCloseListener(handleDisconnect);
+
       await socket.connect();
       await peer.connect();
 
@@ -98,6 +104,7 @@ export const useCreateSession = ({
       webSocketRef.current = socket;
       peerRef.current = peer;
       setLocalStream(stream);
+      setConnected(true);
     } catch (error) {
       notifyError(`${error}`);
     }
@@ -107,5 +114,6 @@ export const useCreateSession = ({
     handleDisconnect,
     handleCreateSession,
     localStream,
+    connected,
   };
 };

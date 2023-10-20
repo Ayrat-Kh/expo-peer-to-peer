@@ -16,6 +16,7 @@ interface UseStartListeningResult {
   handleStartListening: () => Promise<void>;
   handleDisconnect: () => void;
   remoteStream: MediaStream | null;
+  conencted: boolean;
 }
 
 export const useStartListening = ({
@@ -26,12 +27,14 @@ export const useStartListening = ({
   const senderIdRef = useRef<string>('');
   const peerRef = useRef<Peer | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const [conencted, setConnected] = useState<boolean>(false);
 
   const { getItem: getClientId } = useAsyncStorage(StorageKeys.CLIENT_ID);
   const { getItem: getServerUrl } = useAsyncStorage(StorageKeys.SERVER_URL);
 
   const handleDisconnect = useCallback(() => {
     setRemoteStream(null);
+    setConnected(false);
 
     peerRef.current?.close();
     peerRef.current = null;
@@ -82,8 +85,11 @@ export const useStartListening = ({
         setRemoteStream(streams[0]);
       };
 
+      socket.setCloseListener(handleDisconnect);
+
       await socket.connect();
       await peer.connect();
+      setConnected(true);
     } catch (error) {
       notifyError(`${error}`);
     }
@@ -93,5 +99,6 @@ export const useStartListening = ({
     handleStartListening,
     handleDisconnect,
     remoteStream,
+    conencted,
   };
 };

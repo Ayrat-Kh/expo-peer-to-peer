@@ -51,7 +51,7 @@ export const HostScreen = () => {
     Alert.alert('Error occured', message, [{ text: 'Ok', style: 'cancel' }]);
   };
 
-  const { handleCreateSession, handleDisconnect, localStream } =
+  const { handleCreateSession, handleDisconnect, connected, localStream } =
     useCreateSession({
       notifyEmptyRecipient,
       notifyEmptySettings,
@@ -85,8 +85,8 @@ export const HostScreen = () => {
 
       <Button
         tw="mt-3"
-        label={localStream ? 'Stop session' : 'Create session'}
-        onPress={localStream ? handleDisconnect : handleCreateSession}
+        label={connected ? 'Stop session' : 'Create session'}
+        onPress={connected ? handleDisconnect : handleCreateSession}
       />
     </ScreenLayout>
   );
