@@ -9,27 +9,32 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 
-const StyledContainer = styled(ScrollView, 'bg-primary h-full p-4');
+const StyledKeyboardAvoidingView = styled(
+  KeyboardAvoidingView,
+  'bg-primary flex-1 h-full'
+);
+
+const StyledContainer = styled(SafeAreaView, 'p-4');
 
 export const ScreenLayout: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        Keyboard.dismiss();
-      }}
+    <StyledKeyboardAvoidingView
+      behavior={Platform.select({
+        ios: 'padding',
+        default: undefined,
+      })}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.select({
-          ios: 'padding',
-          default: undefined,
-        })}
+      <TouchableWithoutFeedback
+        onPress={() => {
+          Keyboard.dismiss();
+        }}
       >
         <StyledContainer>
-          <SafeAreaView>{children}</SafeAreaView>
+          <ScrollView>{children}</ScrollView>
         </StyledContainer>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </StyledKeyboardAvoidingView>
   );
 };
