@@ -1,5 +1,8 @@
 {
   "expo": {
+    "androidStatusBar": {
+      "translucent": true
+    },
     "name": "expo-peer-2-peer",
     "slug": "expo-peer-2-peer",
     "version": "1.0.0",

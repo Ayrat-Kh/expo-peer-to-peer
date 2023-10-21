@@ -32,8 +32,12 @@ export class Peer {
   constructor() {
     this.peerConnection = new RTCPeerConnection({
       iceServers: [
+        { urls: 'stun:freestun.net:3479' },
+        { urls: 'stun:freestun.net:5350' },
         {
-          urls: 'stun:stun.l.google.com:19302',
+          urls: 'turns:freestun.net:5350',
+          username: 'free',
+          credential: 'free',
         },
       ],
     });

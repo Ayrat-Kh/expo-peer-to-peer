@@ -1,3 +1,4 @@
+import { StatusBar } from 'expo-status-bar';
 import { NativeWindStyleSheet } from 'nativewind';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigationContainer } from 'src/navigation/AppNavigationContainer';
@@ -8,8 +9,11 @@ NativeWindStyleSheet.setOutput({
 
 export default function Root() {
   return (
-    <SafeAreaProvider>
-      <AppNavigationContainer />
-    </SafeAreaProvider>
+    <>
+      <StatusBar style="dark" />
+      <SafeAreaProvider>
+        <AppNavigationContainer />
+      </SafeAreaProvider>
+    </>
   );
 }

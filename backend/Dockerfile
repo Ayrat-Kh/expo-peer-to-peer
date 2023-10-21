@@ -1,4 +1,4 @@
-FROM golang:1.21.3
+FROM golang:1.21.3 AS development
 
 ENV ADDRESS=:5000
 
@@ -10,10 +10,16 @@ RUN go mod download
 
 COPY *.go ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o app
+RUN CGO_ENABLED=0 GOOS=linux go build -o runner
 
-RUN chmod +x ./app
+FROM alpine:3.14 AS production
+
+WORKDIR /app
+
+COPY --from=development /app/runner .
+
+RUN chmod +x ./runner
 
 EXPOSE 5000
 
-CMD ["./app"]
+CMD ["./runner"]
